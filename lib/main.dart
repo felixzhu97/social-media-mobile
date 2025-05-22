@@ -4,7 +4,11 @@ import 'screens/home_screen.dart';
 import 'screens/search_screen.dart';
 import 'screens/add_post_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/login_screen.dart';
 import 'models/user_model.dart';
+import 'services/auth_service.dart';
+import 'services/post_service.dart';
+import 'services/story_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,10 +19,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => UserModel(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserModel()),
+        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => PostService()),
+        ChangeNotifierProvider(create: (_) => StoryService()),
+      ],
       child: MaterialApp(
-        title: 'Instagram克隆',
+        title: 'Social App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
@@ -34,9 +43,46 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const MainScreen(),
+        home: const AuthCheckScreen(),
       ),
     );
+  }
+}
+
+class AuthCheckScreen extends StatefulWidget {
+  const AuthCheckScreen({Key? key}) : super(key: key);
+
+  @override
+  State<AuthCheckScreen> createState() => _AuthCheckScreenState();
+}
+
+class _AuthCheckScreenState extends State<AuthCheckScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // 检查用户是否已登录
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AuthService>(context, listen: false).checkAuth();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
+    // 显示加载中
+    if (authService.isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    // 根据登录状态返回不同的页面
+    return authService.isAuthenticated
+        ? const MainScreen()
+        : const LoginScreen();
   }
 }
 
@@ -94,4 +140,4 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-} 
+}

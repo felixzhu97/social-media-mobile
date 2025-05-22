@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/user_model.dart';
+import '../services/auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -8,9 +10,10 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
+class _ProfileScreenState extends State<ProfileScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  
+
   // 模拟用户数据
   final User _user = User(
     id: 'user1',
@@ -41,17 +44,69 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     super.dispose();
   }
 
+  // 显示退出登录确认对话框
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('退出登录'),
+        content: const Text('确定要退出登录吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Provider.of<AuthService>(context, listen: false).logout();
+            },
+            child: const Text('确定'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(_user.username),
         actions: [
-          IconButton(
+          PopupMenuButton(
             icon: const Icon(Icons.menu),
-            onPressed: () {
-              // 显示菜单
+            onSelected: (value) {
+              if (value == 'logout') {
+                _showLogoutDialog();
+              }
             },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'settings',
+                child: Text('设置'),
+              ),
+              const PopupMenuItem(
+                value: 'archive',
+                child: Text('存档'),
+              ),
+              const PopupMenuItem(
+                value: 'activity',
+                child: Text('活动'),
+              ),
+              const PopupMenuItem(
+                value: 'qrcode',
+                child: Text('二维码'),
+              ),
+              const PopupMenuItem(
+                value: 'saved',
+                child: Text('已保存'),
+              ),
+              const PopupMenuItem(
+                value: 'logout',
+                child: Text('退出登录'),
+              ),
+            ],
           ),
         ],
       ),
@@ -59,7 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         children: [
           // 个人资料头部
           _buildProfileHeader(),
-          
+
           // 选项卡
           TabBar(
             controller: _tabController,
@@ -69,7 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             ],
             indicatorColor: Colors.black,
           ),
-          
+
           // 选项卡内容
           Expanded(
             child: TabBarView(
@@ -111,9 +166,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // 用户名和简介
           Text(
             _user.username,
@@ -127,9 +182,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               padding: const EdgeInsets.only(top: 4),
               child: Text(_user.bio),
             ),
-          
+
           const SizedBox(height: 16),
-          
+
           // 编辑资料按钮
           SizedBox(
             width: double.infinity,
@@ -203,4 +258,4 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       },
     );
   }
-} 
+}

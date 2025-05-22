@@ -1,4 +1,4 @@
-# Instagram Clone - Flutter 社交应用
+# Social App - Flutter 社交应用
 
 基于 Flutter 构建的 Instagram 风格社交媒体应用，包含用户发帖、浏览、点赞和评论等核心功能。
 

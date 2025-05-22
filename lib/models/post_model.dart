@@ -3,7 +3,7 @@ class Post {
   final String userId;
   final String username;
   final String userProfileImageUrl;
-  final String imageUrl;
+  final List<String> imageUrls;
   final String caption;
   final List<String> likes;
   final List<Comment> comments;
@@ -15,13 +15,39 @@ class Post {
     required this.userId,
     required this.username,
     required this.userProfileImageUrl,
-    required this.imageUrl,
+    required this.imageUrls,
     this.caption = '',
     this.likes = const [],
     this.comments = const [],
     required this.timestamp,
     this.location = '',
   });
+
+  factory Post.singleImage({
+    required String id,
+    required String userId,
+    required String username,
+    required String userProfileImageUrl,
+    required String imageUrl,
+    String caption = '',
+    List<String> likes = const [],
+    List<Comment> comments = const [],
+    required DateTime timestamp,
+    String location = '',
+  }) {
+    return Post(
+      id: id,
+      userId: userId,
+      username: username,
+      userProfileImageUrl: userProfileImageUrl,
+      imageUrls: [imageUrl],
+      caption: caption,
+      likes: likes,
+      comments: comments,
+      timestamp: timestamp,
+      location: location,
+    );
+  }
 
   factory Post.fromJson(Map<String, dynamic> json) {
     List<Comment> commentsList = [];
@@ -30,12 +56,19 @@ class Post {
           json['comments'].map((comment) => Comment.fromJson(comment)));
     }
 
+    List<String> imageUrlsList = [];
+    if (json['imageUrl'] != null) {
+      imageUrlsList.add(json['imageUrl']);
+    } else if (json['imageUrls'] != null) {
+      imageUrlsList = List<String>.from(json['imageUrls']);
+    }
+
     return Post(
       id: json['id'],
       userId: json['userId'],
       username: json['username'],
       userProfileImageUrl: json['userProfileImageUrl'],
-      imageUrl: json['imageUrl'],
+      imageUrls: imageUrlsList,
       caption: json['caption'] ?? '',
       likes: List<String>.from(json['likes'] ?? []),
       comments: commentsList,
@@ -50,7 +83,7 @@ class Post {
       'userId': userId,
       'username': username,
       'userProfileImageUrl': userProfileImageUrl,
-      'imageUrl': imageUrl,
+      'imageUrls': imageUrls,
       'caption': caption,
       'likes': likes,
       'comments': comments.map((comment) => comment.toJson()).toList(),
@@ -64,7 +97,7 @@ class Post {
     String? userId,
     String? username,
     String? userProfileImageUrl,
-    String? imageUrl,
+    List<String>? imageUrls,
     String? caption,
     List<String>? likes,
     List<Comment>? comments,
@@ -76,7 +109,7 @@ class Post {
       userId: userId ?? this.userId,
       username: username ?? this.username,
       userProfileImageUrl: userProfileImageUrl ?? this.userProfileImageUrl,
-      imageUrl: imageUrl ?? this.imageUrl,
+      imageUrls: imageUrls ?? this.imageUrls,
       caption: caption ?? this.caption,
       likes: likes ?? this.likes,
       comments: comments ?? this.comments,
@@ -124,4 +157,4 @@ class Comment {
       'timestamp': timestamp.toIso8601String(),
     };
   }
-} 
+}

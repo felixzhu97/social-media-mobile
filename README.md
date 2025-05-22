@@ -130,8 +130,8 @@ lib/
 如发现任何问题，请通过以下方式反馈：
 
 - 在 GitHub Issues 中创建新问题
-- 邮件联系: your-email@example.com
+- 邮件联系: 1434866867@qq.com
 
 ## 📝 许可证
 
-MIT © 2025 Your Name
+MIT
